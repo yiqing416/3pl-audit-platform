@@ -1,14 +1,49 @@
 services:
   db:
     image: postgres:16
+    container_name: audit_db
     environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: auditdb
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - audit_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auditdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: audit_api
+    environment:
+      # Use service name "db" inside docker network
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/auditdb
+      # If you use CORS origin restrictions, include the web origin
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: audit_web
+    environment:
+      # IMPORTANT: web container should call api by service name "api"
+      NEXT_PUBLIC_API_BASE: http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
 
 volumes:
-  pgdata:
+  audit_pgdata:

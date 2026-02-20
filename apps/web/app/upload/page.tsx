@@ -3,16 +3,27 @@
 import { useState } from "react";
 
 type UploadResponse = {
+  invoice_id: number;
   filename: string;
   headers: string[];
-  parsed_rows: number;
-  preview: Array<{
+  field_map: Record<string, string>;
+  valid_rows: number;
+  invalid_rows: number;
+  preview_valid: Array<{
+    row_number: number;
     fee_type_raw: string;
-    amount: string;
+    amount_raw: string;
+    amount_cents: number;
     order_ref?: string | null;
     tracking_ref?: string | null;
   }>;
+  preview_invalid: Array<{
+    row_number: number;
+    error: string;
+    raw: Record<string, any>;
+  }>;
 };
+
 
 
 export default function UploadPage() {
@@ -85,28 +96,34 @@ export default function UploadPage() {
       {result && (
         <div className="space-y-3">
             <div><b>Filename:</b> {result.filename}</div>
-            <div><b>Parsed rows:</b> {result.parsed_rows}</div>
+            <div><b>Valid rows:</b> {result.valid_rows}</div>
+            <div><b>Invalid rows:</b> {result.invalid_rows}</div>
             <div><b>Headers:</b> {result.headers.join(", ")}</div>
 
             <table className="border-collapse border w-full">
             <thead>
                 <tr>
+                <th className="border p-2">row_num</th>
                 <th className="border p-2">fee_type_raw</th>
-                <th className="border p-2">amount</th>
+                <th className="border p-2">amount_raw</th>
+                <th className="border p-2">amount_cents</th>
                 <th className="border p-2">order_ref</th>
                 <th className="border p-2">tracking_ref</th>
                 </tr>
             </thead>
             <tbody>
-                {result.preview.map((r, i) => (
+              {result.preview_valid.map((r, i) => (
                 <tr key={i}>
-                    <td className="border p-2">{r.fee_type_raw}</td>
-                    <td className="border p-2">{r.amount}</td>
-                    <td className="border p-2">{r.order_ref ?? ""}</td>
-                    <td className="border p-2">{r.tracking_ref ?? ""}</td>
+                  <td className="border p-2">{r.row_number}</td>
+                  <td className="border p-2">{r.fee_type_raw}</td>
+                  <td className="border p-2">{r.amount_raw}</td>
+                  <td className="border p-2">{r.amount_cents}</td>
+                  <td className="border p-2">{r.order_ref ?? ""}</td>
+                  <td className="border p-2">{r.tracking_ref ?? ""}</td>
                 </tr>
-                ))}
+              ))}
             </tbody>
+
             </table>
         </div>
         )}

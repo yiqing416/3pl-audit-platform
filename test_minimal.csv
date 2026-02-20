@@ -1,4 +1,4 @@
-fee_type_raw,amount
-Pick & Pack,3.50
-Shipping Label,5.25
-Storage,12.00
+fee_type_raw,amount,order_ref,tracking_ref
+Fuel Surcharge,$12.34,ORD-1001,TRK-AAA
+Delivery Area Surcharge,5.00,ORD-1002,TRK-BBB
+Fuel Surcharge,(1.25),ORD-1001,TRK-AAA

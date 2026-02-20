@@ -71,3 +71,10 @@ build/
 # Docker
 pgdata/
 
+# env
+.env
+.env.*
+!.env.example
+apps/**/.env
+apps/**/.env.*
+!apps/**/.env.example
